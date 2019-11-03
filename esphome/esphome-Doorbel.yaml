@@ -1,0 +1,61 @@
+esphome:
+  name: esphome_Doorbell
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: !secret ssid
+  password: !secret password
+  ap:
+    ssid: "esphome02 Fallback Hotspot"
+    password: !secret password
+captive_portal:
+
+#Add logger to ESP Home
+logger:
+ 
+# Enable webserver on port 80 
+web_server:
+  port: 80 
+ 
+# Enable Home Assistant API
+api:
+  password: !secret password
+
+# Enable OTA password
+ota:
+  password: !secret password
+  
+sensor:
+    # Enable uptime of the ESP Home
+  - platform: uptime
+    name: "Uptime Sensor doorbell"
+    # Enable Wifi singal checker
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor doorbell"
+    update_interval: 60s    
+    
+uart:
+  tx_pin: D2
+  rx_pin: D5
+  baud_rate: 9600
+
+dfplayer:
+  on_finished_playback:
+    then:
+      - dfplayer.stop
+      
+binary_sensor:
+ - platform: status
+   name: "Doorbell Status"
+ - platform: gpio
+   pin: 
+     number: D1
+     mode: INPUT_PULLUP
+   name: "Doorbell"
+   filters:
+     - invert:
+   on_press:
+     then:
+     - dfplayer.start
+    
